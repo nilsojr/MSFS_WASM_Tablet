@@ -96,12 +96,40 @@ void drawLabel(NVGcontext* vg, const char* text, float x, float y, float w, floa
 {
 	NVG_NOTUSED(w);
 
-	nvgFontSize(vg, 15.0f);
+	nvgFontSize(vg, 20.0f);
 	nvgFontFace(vg, "sans");
-	nvgFillColor(vg, nvgRGBA(0, 255, 0, 255));
+	nvgFillColor(vg, nvgRGBA(255, 255, 255, 255));
 
 	nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
 	nvgText(vg, x, y + h * 0.5f, text, nullptr);
+}
+
+void drawEditBoxBase(NVGcontext* vg, float x, float y, float w, float h)
+{
+	NVGpaint bg;
+	// Edit
+	bg = nvgBoxGradient(vg, x + 1, y + 1 + 1.5f, w - 2, h - 2, 3, 4, nvgRGBA(255, 255, 255, 32), nvgRGBA(32, 32, 32, 32));
+	nvgBeginPath(vg);
+	nvgRoundedRect(vg, x + 1, y + 1, w - 2, h - 2, 4 - 1);
+	nvgFillPaint(vg, bg);
+	nvgFill(vg);
+
+	nvgBeginPath(vg);
+	nvgRoundedRect(vg, x + 0.5f, y + 0.5f, w - 1, h - 1, 4 - 0.5f);
+	nvgStrokeColor(vg, nvgRGBA(0, 0, 0, 48));
+	nvgStroke(vg);
+}
+
+void drawEditBox(NVGcontext* vg, const char* text, float x, float y, float w, float h)
+{
+
+	drawEditBoxBase(vg, x, y, w, h);
+
+	nvgFontSize(vg, 20.0f);
+	nvgFontFace(vg, "sans");
+	nvgFillColor(vg, nvgRGBA(255, 255, 255, 64));
+	nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+	nvgText(vg, x + h * 0.3f, y + h * 0.5f, text, nullptr);
 }
 
 const int LEFT_MARGIN = 20;
@@ -118,11 +146,21 @@ Data	TabletData;
 struct ButtonData {
 	int x = 0;
 	int y = 0;
-	int width = 0;
-	int height = 0;
+	int width = 100;
+	int height = 100;
 };
 ButtonData ButtonPage1;
 ButtonData ButtonPage2;
+
+struct TextEditData {
+	int x = 0;
+	int y = 0;
+	int width = 300;
+	int height = 30;
+	bool active = false;
+};
+TextEditData TextEditName;
+TextEditData TextEditCompany;
 
 int loadData(NVGcontext* vg)
 {
@@ -163,6 +201,12 @@ void drawPage2(NVGcontext* nvgctx, sGaugeDrawData* p_draw_data)
 {
 	drawPageStatus(nvgctx, p_draw_data);
 
+	drawLabel(nvgctx, "Pilot info", LEFT_MARGIN, TOP_MARGIN, 300, 22);
+
+	drawEditBox(nvgctx, "Name", LEFT_MARGIN, TOP_MARGIN + 30, 300, 30);
+
+	drawEditBox(nvgctx, "Company", LEFT_MARGIN, TOP_MARGIN + 60, 300, 30);
+
 	drawButton(nvgctx, 0, "Go back", ButtonPage2.x, ButtonPage2.y, ButtonPage2.width, ButtonPage2.height, nvgRGBA(0, 0, 200, 100));
 }
 
@@ -172,7 +216,12 @@ void initButtons(sGaugeDrawData* p_draw_data)
 	ButtonPage1.x = LEFT_MARGIN; ButtonPage1.y = TOP_MARGIN;
 
 	ButtonPage2.width = 100; ButtonPage2.height = 100;
-	ButtonPage2.x = LEFT_MARGIN; ButtonPage2.y = p_draw_data->fbHeight - ButtonPage2.height;
+	ButtonPage2.x = LEFT_MARGIN; ButtonPage2.y = p_draw_data->fbHeight - ButtonPage2.height - BOTTOM_MARGIN;
+}
+
+bool isButtonHit(const ButtonData& button, int mouseX, int mouseY) {
+	return (mouseX >= button.x && mouseX <= button.x + button.width 
+		&& mouseY >= button.y && mouseY <= button.y + button.height);
 }
 
 extern "C" {
@@ -255,25 +304,20 @@ extern "C" {
 		{
 		case MOUSE_LEFTSINGLE:
 		{
-			/*if (TabletData.page == 1)
+			if (TabletData.page == 1)
 			{
-				if (isButtonHit(&ButtonPage1, fX, fY))
+				if (isButtonHit(ButtonPage1, fX, fY))
 				{
 					TabletData.page = 2;
 				}
 			}
 			else
 			{
-				if (isButtonHit(&ButtonPage2, fX, fY))
+				if (isButtonHit(ButtonPage2, fX, fY))
 				{
 					TabletData.page = 1;
 				}
-			}*/
-			if (TabletData.page == 1)
-				TabletData.page = 2;
-			else
-				TabletData.page = 1;
-
+			}
 			break;
 		}
 		default:

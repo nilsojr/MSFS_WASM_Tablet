@@ -9,6 +9,8 @@
 #include "EmbraerTablet.h"
 #include <GdiPlus.h>
 #include <map>
+#include "Button.h"
+#include "TextEdit.h"
 
 std::map < FsContext, NVGcontext*> g_TabletNVGContext;
 
@@ -143,22 +145,8 @@ struct Data {
 };
 Data	TabletData;
 
-struct ButtonData {
-	int x = 0;
-	int y = 0;
-	int width = 100;
-	int height = 100;
-};
 ButtonData ButtonPage1;
 ButtonData ButtonPage2;
-
-struct TextEditData {
-	int x = 0;
-	int y = 0;
-	int width = 300;
-	int height = 30;
-	bool active = false;
-};
 TextEditData TextEditName;
 TextEditData TextEditCompany;
 
@@ -194,7 +182,7 @@ void drawPage1(NVGcontext* nvgctx, sGaugeDrawData* p_draw_data)
 {
 	drawPageStatus(nvgctx, p_draw_data);
 
-	drawButton(nvgctx, 0, "Click me", ButtonPage1.x, ButtonPage1.y, ButtonPage1.width, ButtonPage1.height, nvgRGBA(0, 0, 200, 100));
+	drawButton(nvgctx, 0, ButtonPage1.name, ButtonPage1.x, ButtonPage1.y, ButtonPage1.width, ButtonPage1.height, nvgRGBA(0, 0, 200, 100));
 }
 
 void drawPage2(NVGcontext* nvgctx, sGaugeDrawData* p_draw_data)
@@ -207,16 +195,18 @@ void drawPage2(NVGcontext* nvgctx, sGaugeDrawData* p_draw_data)
 
 	drawEditBox(nvgctx, "Company", LEFT_MARGIN, TOP_MARGIN + 60, 300, 30);
 
-	drawButton(nvgctx, 0, "Go back", ButtonPage2.x, ButtonPage2.y, ButtonPage2.width, ButtonPage2.height, nvgRGBA(0, 0, 200, 100));
+	drawButton(nvgctx, 0, ButtonPage2.name, ButtonPage2.x, ButtonPage2.y, ButtonPage2.width, ButtonPage2.height, nvgRGBA(0, 0, 200, 100));
 }
 
 void initButtons(sGaugeDrawData* p_draw_data)
 {
 	ButtonPage1.width = 100; ButtonPage1.height = 100;
 	ButtonPage1.x = LEFT_MARGIN; ButtonPage1.y = TOP_MARGIN;
+	ButtonPage1.name = "Click me";
 
 	ButtonPage2.width = 100; ButtonPage2.height = 100;
 	ButtonPage2.x = LEFT_MARGIN; ButtonPage2.y = p_draw_data->fbHeight - ButtonPage2.height - BOTTOM_MARGIN;
+	ButtonPage2.name = "Go back";
 }
 
 bool isButtonHit(const ButtonData& button, int mouseX, int mouseY) {

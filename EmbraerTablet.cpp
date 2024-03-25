@@ -14,6 +14,8 @@
 
 std::map < FsContext, NVGcontext*> g_TabletNVGContext;
 
+const int PAGE2_TEXT_EDIT_COUNT = 2;
+
 // Returns 1 if col.rgba is 0.0f,0.0f,0.0f,0.0f, 0 otherwise
 int isBlack(NVGcolor col)
 {
@@ -150,8 +152,9 @@ ButtonData ButtonPage2;
 TextEditData TextEditName;
 TextEditData TextEditCompany;
 
-int loadData(NVGcontext* vg)
-{
+TextEditData TextEdits_page2[PAGE2_TEXT_EDIT_COUNT];
+
+int loadData(NVGcontext* vg) {
 	TabletData.fontNormal = nvgCreateFont(vg, "sans", "./data/Roboto-Regular.ttf");
 	if (TabletData.fontNormal == -1)
 	{
@@ -170,47 +173,69 @@ int loadData(NVGcontext* vg)
 	return 0;
 }
 
-void drawPageStatus(NVGcontext* nvgctx, sGaugeDrawData* p_draw_data)
-{
+void drawPageStatus(NVGcontext* nvgctx, sGaugeDrawData* p_draw_data) {
 	char buffer[50];
 	sprintf(buffer, "Current page: %d", TabletData.page);
 	const char* result = buffer;
 	drawLabel(nvgctx, result, (float)p_draw_data->fbWidth / 2, 0, 280, 30);
 }
 
-void drawPage1(NVGcontext* nvgctx, sGaugeDrawData* p_draw_data)
-{
+void drawPage1(NVGcontext* nvgctx, sGaugeDrawData* p_draw_data) {
 	drawPageStatus(nvgctx, p_draw_data);
 
 	drawButton(nvgctx, 0, ButtonPage1.name, ButtonPage1.x, ButtonPage1.y, ButtonPage1.width, ButtonPage1.height, nvgRGBA(0, 0, 200, 100));
 }
 
-void drawPage2(NVGcontext* nvgctx, sGaugeDrawData* p_draw_data)
-{
+void drawPage2(NVGcontext* nvgctx, sGaugeDrawData* p_draw_data) {
 	drawPageStatus(nvgctx, p_draw_data);
 
 	drawLabel(nvgctx, "Pilot info", LEFT_MARGIN, TOP_MARGIN, 300, 22);
 
-	drawEditBox(nvgctx, "Name", LEFT_MARGIN, TOP_MARGIN + 30, 300, 30);
+	for (int i = 0; i < PAGE2_TEXT_EDIT_COUNT; i++)
+	{
+		drawEditBox(nvgctx, TextEdits_page2[i].text, TextEdits_page2[i].x, TextEdits_page2[i].y, TextEdits_page2[i].width, TextEdits_page2[i].height);
+	}
 
-	drawEditBox(nvgctx, "Company", LEFT_MARGIN, TOP_MARGIN + 60, 300, 30);
+	// DRAW LABELS
+
+	// DRAW BUTTONS
 
 	drawButton(nvgctx, 0, ButtonPage2.name, ButtonPage2.x, ButtonPage2.y, ButtonPage2.width, ButtonPage2.height, nvgRGBA(0, 0, 200, 100));
 }
 
-void initButtons(sGaugeDrawData* p_draw_data)
-{
-	ButtonPage1.width = 100; ButtonPage1.height = 100;
-	ButtonPage1.x = LEFT_MARGIN; ButtonPage1.y = TOP_MARGIN;
+void initButtons(sGaugeDrawData* p_draw_data) {
+	ButtonPage1.width = 100; 
+	ButtonPage1.height = 100;
+	ButtonPage1.x = LEFT_MARGIN; 
+	ButtonPage1.y = TOP_MARGIN;
 	ButtonPage1.name = "Click me";
 
-	ButtonPage2.width = 100; ButtonPage2.height = 100;
-	ButtonPage2.x = LEFT_MARGIN; ButtonPage2.y = p_draw_data->fbHeight - ButtonPage2.height - BOTTOM_MARGIN;
+	ButtonPage2.width = 100; 
+	ButtonPage2.height = 100;
+	ButtonPage2.x = LEFT_MARGIN; 
+	ButtonPage2.y = p_draw_data->fbHeight - ButtonPage2.height - BOTTOM_MARGIN;
 	ButtonPage2.name = "Go back";
 }
 
+void initTextEdits() {
+	TextEditName.x = LEFT_MARGIN;
+	TextEditName.y = TOP_MARGIN + 30;
+	TextEditName.width = 300;
+	TextEditName.height = 30;
+	TextEditName.text = "Name";
+
+	TextEditCompany.x = LEFT_MARGIN;
+	TextEditCompany.y = TOP_MARGIN + 60;
+	TextEditCompany.width = 300;
+	TextEditCompany.height = 30;
+	TextEditCompany.text = "Company";
+
+	TextEdits_page2[0] = TextEditName;
+	TextEdits_page2[1] = TextEditCompany;
+}
+
 bool isButtonHit(const ButtonData& button, int mouseX, int mouseY) {
-	return (mouseX >= button.x && mouseX <= button.x + button.width 
+	return (mouseX >= button.x && mouseX <= button.x + button.width
 		&& mouseY >= button.y && mouseY <= button.y + button.height);
 }
 
